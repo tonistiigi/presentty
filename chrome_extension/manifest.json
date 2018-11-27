@@ -1,0 +1,13 @@
+{
+  "name": "presentty",
+  "version": "0.1",
+  "description": "terminal inlined in presentations",
+  "content_scripts": [
+    {
+      "matches": ["https://docs.google.com/presentation/*"],
+      "js": ["page.js"],
+      "all_frames": true
+    }
+  ],
+  "manifest_version": 2
+}
