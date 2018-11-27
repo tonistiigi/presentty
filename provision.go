@@ -40,3 +40,21 @@ func provisionDemos(dir string, demos map[string]DemoConfig) (map[string][]strin
 
 	return m, nil
 }
+
+func cleanup(m map[string][]string) error {
+	for name, dc := range m {
+		cmd := exec.Command("docker", "rm", "-f", dc[0])
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+		cmd = exec.Command("docker", "rmi", "demo-"+name)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
+}

@@ -6,7 +6,7 @@ RUN go get -d github.com/LK4D4/vndr \
   && cd /go/src/github.com/LK4D4/vndr \
 	&& git checkout $VNDR_VERSION \
 	&& go install ./
-WORKDIR /go/src/github.com/tonistiigi/prestty
+WORKDIR /go/src/github.com/tonistiigi/presentty
 COPY . .
 # Remove vendor first to workaround  https://github.com/LK4D4/vndr/issues/63.
 RUN rm -rf vendor

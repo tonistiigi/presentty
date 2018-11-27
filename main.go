@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	dockercommand "github.com/tonistiigi/prestty/dockercommand"
+	dockercommand "github.com/tonistiigi/presentty/dockercommand"
 	"github.com/yudai/gotty/server"
 	"github.com/yudai/gotty/utils"
 )
@@ -43,6 +43,9 @@ func run() error {
 	}
 
 	log.Printf("provisioned demos: %+v", m)
+	defer func() {
+		cleanup(m)
+	}()
 
 	factory, err := dockercommand.NewFactory(m, &dockercommand.Options{})
 	if err != nil {
