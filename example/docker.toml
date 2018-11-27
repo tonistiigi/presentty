@@ -1,0 +1,8 @@
+size=18
+light=true
+
+[demo.dockerdemo]
+build="./docker"
+flags=["--privileged"]
+cmd="tmux a -d -t demo"
+# cmd="ash"

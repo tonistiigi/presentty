@@ -10,14 +10,16 @@ import (
 
 // Config provides containerd configuration data for the server
 type Config struct {
+	Size  int                   `toml:"size"`
+	Light bool                  `toml:"light"`
 	Demos map[string]DemoConfig `toml:"demo"`
 }
 
 type DemoConfig struct {
 	// ID string `toml`
-	Build       string `toml:"build"`
-	MainCommand string `toml:"main"`
-	Command     string `toml:"cmd"`
+	Build   string   `toml:"build"`
+	Flags   []string `toml:"flags"`
+	Command string   `toml:"cmd"`
 }
 
 func Load(r io.Reader) (Config, *toml.MetaData, error) {

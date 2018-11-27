@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -29,8 +30,8 @@ type LocalCommand struct {
 	ptyClosed chan struct{}
 }
 
-func New(id string) (*LocalCommand, error) {
-	cmd := exec.Command("docker", "exec", "-it", id, "ash")
+func New(id, args string) (*LocalCommand, error) {
+	cmd := exec.Command("docker", append([]string{"exec", "-it", id}, strings.Split(args, " ")...)...)
 
 	pty, err := pty.Start(cmd)
 	if err != nil {

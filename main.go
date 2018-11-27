@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	dockercommand "github.com/tonistiigi/prestty/dockercommand"
@@ -36,7 +37,14 @@ func run() error {
 		return errors.New("no demos in config")
 	}
 
-	factory, err := dockercommand.NewFactory("", nil, &dockercommand.Options{})
+	m, err := provisionDemos(filepath.Dir(configFile), cfg.Demos)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("provisioned demos: %+v", m)
+
+	factory, err := dockercommand.NewFactory(m, &dockercommand.Options{})
 	if err != nil {
 		return err
 	}
@@ -46,42 +54,49 @@ func run() error {
 	if err := utils.ApplyDefaultValues(appOptions); err != nil {
 		return err
 	}
-	colorPaletteOverides := []string{
-		"#073642", /*  0: black    */
-		"#dc322f", /*  1: red      */
-		"#859900", /*  2: green    */
-		"#b58900", /*  3: yellow   */
-		"#268bd2", /*  4: blue     */
-		"#d33682", /*  5: magenta  */
-		"#2aa198", /*  6: cyan     */
-		"#eee8d5", /*  7: white    */
-		"#002b36", /*  8: brblack  */
-		"#cb4b16", /*  9: brred    */
-		"#586e75", /* 10: brgreen  */
-		"#506067", /* 11: bryellow */
-		"#839496", /* 12: brblue   */
-		"#6c71c4", /* 13: brmagenta*/
-		"#93a1a1", /* 14: brcyan   */
-		"#fdf6e3", /* 15: brwhite  */
-	}
+	if cfg.Light {
+		colorPaletteOverides := []string{
+			"#073642", /*  0: black    */
+			"#dc322f", /*  1: red      */
+			"#859900", /*  2: green    */
+			"#b58900", /*  3: yellow   */
+			"#268bd2", /*  4: blue     */
+			"#d33682", /*  5: magenta  */
+			"#2aa198", /*  6: cyan     */
+			"#eee8d5", /*  7: white    */
+			"#002b36", /*  8: brblack  */
+			"#cb4b16", /*  9: brred    */
+			"#586e75", /* 10: brgreen  */
+			"#506067", /* 11: bryellow */
+			"#839496", /* 12: brblue   */
+			"#6c71c4", /* 13: brmagenta*/
+			"#93a1a1", /* 14: brcyan   */
+			"#fdf6e3", /* 15: brwhite  */
+		}
 
-	var cpo []*string
-	for _, v := range colorPaletteOverides {
-		vv := v
-		cpo = append(cpo, &vv)
-	}
+		var cpo []*string
+		for _, v := range colorPaletteOverides {
+			vv := v
+			cpo = append(cpo, &vv)
+		}
 
-	for _, v := range cpo {
-		log.Println(*v)
+		appOptions.Preferences = &server.HtermPrefernces{
+			CtrlPlusMinusZeroZoom: true,
+			BackgroundColor:       colorPaletteOverides[15],
+			ForegroundColor:       colorPaletteOverides[11],
+			CursorColor:           "rgba(101, 123, 131, 0.4)",
+			// FontSize:              18,
+			ColorPaletteOverrides: cpo,
+			// EnableBoldAsBright:    false,
+		}
+	} else {
+		appOptions.Preferences = &server.HtermPrefernces{
+			CtrlPlusMinusZeroZoom: true,
+			// EnableBoldAsBright:    false,
+		}
 	}
-
-	appOptions.Preferences = &server.HtermPrefernces{
-		CtrlPlusMinusZeroZoom: true,
-		BackgroundColor:       colorPaletteOverides[15],
-		ForegroundColor:       colorPaletteOverides[11],
-		CursorColor:           "rgba(101, 123, 131, 0.4)",
-		FontSize:              18,
-		ColorPaletteOverrides: cpo,
+	if cfg.Size != 0 {
+		appOptions.Preferences.FontSize = cfg.Size
 	}
 	appOptions.PermitWrite = true
 
