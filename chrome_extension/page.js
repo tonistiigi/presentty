@@ -93,7 +93,7 @@ function scanListener() {
         return
       }
     }
-		var v = term.getAttribute("xlink:href").match(/^#term=(.+)$/)
+		var v = term.getAttribute("xlink:href").match(/.*^#term=(.+)$/)
     if (v) {
 			var rest = v[1]
 			rest = rest.replace(/,autostart$/g, "")

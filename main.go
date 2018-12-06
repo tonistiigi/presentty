@@ -25,7 +25,9 @@ func main() {
 
 func run() error {
 	var configFile string
+	var asciinema bool
 	flag.StringVar(&configFile, "config", "config.toml", "Config file")
+	flag.BoolVar(&asciinema, "asciinema", false, "save asciinema")
 	flag.Parse()
 
 	cfg, _, err := LoadFile(configFile)
@@ -47,7 +49,7 @@ func run() error {
 		cleanup(m)
 	}()
 
-	factory, err := dockercommand.NewFactory(m, &dockercommand.Options{})
+	factory, err := dockercommand.NewFactory(m, &dockercommand.Options{}, asciinema)
 	if err != nil {
 		return err
 	}

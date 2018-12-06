@@ -14,12 +14,13 @@ type Options struct {
 }
 
 type Factory struct {
-	m       map[string][]string
-	options *Options
-	opts    []Option
+	m         map[string][]string
+	options   *Options
+	opts      []Option
+	asciinema bool
 }
 
-func NewFactory(m map[string][]string, options *Options) (*Factory, error) {
+func NewFactory(m map[string][]string, options *Options, asciinema bool) (*Factory, error) {
 	opts := []Option{WithCloseSignal(syscall.Signal(options.CloseSignal))}
 	if options.CloseTimeout >= 0 {
 		opts = append(opts, WithCloseTimeout(time.Duration(options.CloseTimeout)*time.Second))
@@ -28,7 +29,8 @@ func NewFactory(m map[string][]string, options *Options) (*Factory, error) {
 	return &Factory{
 		m: m,
 		// options: options,
-		opts: opts,
+		opts:      opts,
+		asciinema: asciinema,
 	}, nil
 }
 
@@ -53,5 +55,5 @@ func (factory *Factory) New(params map[string][]string) (server.Slave, error) {
 		return nil, errors.Errorf("invalid demo id %s", id)
 	}
 
-	return New(args[0], args[1])
+	return New(args[0], args[1], factory.asciinema)
 }

@@ -30,8 +30,12 @@ type LocalCommand struct {
 	ptyClosed chan struct{}
 }
 
-func New(id, args string) (*LocalCommand, error) {
-	cmd := exec.Command("docker", append([]string{"exec", "-it", id}, strings.Split(args, " ")...)...)
+func New(id, args string, asciinema bool) (*LocalCommand, error) {
+	argsArray := append([]string{"exec", "-it", id}, strings.Split(args, " ")...)
+	cmd := exec.Command("docker", argsArray...)
+	if asciinema {
+		cmd = exec.Command("asciinema", "rec", "-t", id, "-c", strings.Join(append([]string{"docker"}, argsArray...), " "), id+"_"+time.Now().Format("15040500000")+".rec")
+	}
 
 	pty, err := pty.Start(cmd)
 	if err != nil {
